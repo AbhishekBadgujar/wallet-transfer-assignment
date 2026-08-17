@@ -1,4 +1,4 @@
-1. Problem Statement
+1. Problem Statement - Functional Requirement
 As per my understanding, have to create a wallet-to-wallet transfer service with the following endpoint POST /transfers with few key requirements
     1. Exactly once behaviour meaning a transaction should execute only once, this has to be implemented through the use of an idempotency key which is the mechanism being used for a lot of scenarios of this type.
     2. Double-entry ledger meaning credit and debit both should be happening in one transaction, debit from sender, credit to receiver.
