@@ -2,7 +2,7 @@
 As per my understanding, have to create a wallet-to-wallet transfer service with the following endpoint POST /transfers with few key requirements
     1. Exactly once behaviour meaning a transaction should execute only once, this has to be implemented through the use of an idempotency key which is the mechanism being used for a lot of scenarios of this type.
     2. Double-entry ledger meaning credit and debit both should be happening in one transaction, debit from sender, credit to receiver.
-    3. Correct wallet balances in concurrent situations - during concurreny i.e 4-5 transactions at the same time , need to make sure there are no race conditions, might use mutex for it.
+    3. Correct wallet balances in concurrent situations - during concurrency i.e 4-5 transactions at the same time , need to make sure there are no race conditions, might use mutex for it.
     4. A safe transfer state machine (PENDING -> PROCESSED/FAILED)
 
 2. API contract
@@ -35,7 +35,7 @@ Error cases:
 400 — invalid payload (missing fields, non-positive amount, same wallet twice)
 404 — wallet does not exist
 409 — Idempotency key reused with a different payload
-200/201 — Returning response from idempotent stored succesfuly result from a prior successful result for a repeated idempotency key
+200/201 — Returning response from idempotent stored successfully result from a prior successful result for a repeated idempotency key
 
 3. Database Design
 Tables: wallets, transfers, ledger_entries, idempotency_records as per requirement.
@@ -53,7 +53,7 @@ replaced a manually-created local DB so the schema is actually reproducible
 from the repo instead of only existing on one machine.
 
 4. How to implement idempotency
-When a request first comes, I will look it up in the idempotent__records table.If found, we can return it right then and there. If not found I will proceed with
+When a request first comes, I will look it up in the idempotency_records table. If found, we can return it right then and there. If not found I will proceed with
 the transaction and then add it there at the end of the transaction.
 Will make a request hash from the payload and compare it too if it doesn't match then will return 409 conflict.
 
@@ -73,7 +73,7 @@ by aborting one of them. Fixed by acquiring the FOR UPDATE locks before
 inserting the transfer row — a transaction never blocks on a lock it already
 holds, so the FK check on the insert is satisfied for free instead of racing.
 
-6. Architechture - LLD 
+6. Architecture - LLD 
 Going to use handler, service, repository pattern, this make sures everything is loosely coupled and new features can be added without much modification and regression. 
 Handler will handle api side of things i.e request and response
 Service will handle business logic
